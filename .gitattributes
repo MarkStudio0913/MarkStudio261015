@@ -1,0 +1,20 @@
+# 统一换行符：仓库内文本文件一律以 LF 存储，避免 Windows/Linux 协作时的 CRLF 抖动
+* text=auto eol=lf
+
+# 明确按二进制处理，禁止换行符/文本转换（防止图片、字体、二进制资源被破坏）
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.bmp  binary
+*.ico  binary
+*.icns binary
+*.ttf  binary
+*.otf  binary
+*.woff binary
+*.woff2 binary
+*.eot  binary
+*.pdf  binary
+*.zip  binary
+*.asar binary

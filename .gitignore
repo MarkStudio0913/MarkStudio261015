@@ -1,0 +1,28 @@
+# 依赖
+node_modules/
+
+# 构建产物（electron-builder 输出）——用前导斜杠锚定到仓库根目录，
+# 否则会误伤 vendor/vditor/dist/（gitignore 中不带 / 前缀的模式匹配任意层级）
+/dist*/
+*.asar
+*.asar.bak
+
+# 注意：vendor/ 必须入库（内置离线引擎 + MarkStudio 补丁版 index.js + 第三方 LICENSE 文件），
+# 切勿在此忽略它。
+
+# 日志
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# 本地 / 编辑器 / 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# 本地开发状态（不入库）
+.zcode/

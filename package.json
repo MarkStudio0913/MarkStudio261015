@@ -1,0 +1,105 @@
+{
+  "name": "markstudio",
+  "version": "1.0.0",
+  "description": "MarkStudio - 一款所见即所得的 Markdown 编辑器",
+  "main": "src/main/main.js",
+  "author": "MarkStudio",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "postinstall": "node scripts/copy-vendor.js",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win",
+    "dist:linux": "electron-builder --linux",
+    "smoke": "cross-env= node scripts/smoke.js"
+  },
+  "dependencies": {
+    "iconv-lite": "^0.6.3"
+  },
+  "devDependencies": {
+    "electron": "31.7.7",
+    "electron-builder": "24.13.3",
+    "vditor": "^3.10.8"
+  },
+  "build": {
+    "appId": "com.markstudio.app",
+    "productName": "MarkStudio",
+    "copyright": "Copyright © 2026 MarkStudio",
+    "directories": {
+      "output": "dist",
+      "buildResources": "resources"
+    },
+    "files": [
+      "src/**/*",
+      "vendor/**/*",
+      "resources/icon.png",
+      "resources/icon.ico",
+      "package.json"
+    ],
+    "electronLanguages": ["zh-CN", "en-US"],
+    "compression": "maximum",
+    "win": {
+      "icon": "resources/icon.ico",
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ],
+      "fileAssociations": [
+        {
+          "ext": "md",
+          "name": "Markdown 文档",
+          "description": "Markdown 文档",
+          "role": "Editor",
+          "icon": "resources/icon.ico"
+        },
+        {
+          "ext": "markdown",
+          "name": "Markdown 文档",
+          "description": "Markdown 文档",
+          "role": "Editor",
+          "icon": "resources/icon.ico"
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "MarkStudio",
+      "artifactName": "MarkStudio-Setup-${version}.${ext}",
+      "uninstallDisplayName": "MarkStudio - Markdown 编辑器",
+      "include": "build/installer.nsh",
+      "installerSidebar": "build/installer-bg.bmp",
+      "uninstallerSidebar": "build/installer-bg.bmp"
+    },
+    "portable": {
+      "artifactName": "MarkStudio-Portable-${version}.${ext}"
+    },
+    "linux": {
+      "icon": "resources/icon.png",
+      "target": [
+        { "target": "AppImage", "arch": ["x64"] },
+        { "target": "deb", "arch": ["x64"] },
+        { "target": "rpm", "arch": ["x64"] }
+      ],
+      "category": "Office",
+      "maintainer": "MarkStudio",
+      "synopsis": "WYSIWYG Markdown editor",
+      "description": "MarkStudio - 所见即所得的 Markdown 桌面编辑器",
+      "artifactName": "MarkStudio-${version}-${arch}.${ext}",
+      "desktop": {
+        "Name": "MarkStudio",
+        "Comment": "WYSIWYG Markdown Editor",
+        "Categories": "Office;TextEditor;",
+        "MimeType": "text/markdown;text/plain;",
+        "StartupNotify": "true"
+      },
+      "fileAssociations": [
+        { "ext": "md", "name": "Markdown", "description": "Markdown document", "mimeType": "text/markdown" },
+        { "ext": "markdown", "name": "Markdown", "description": "Markdown document", "mimeType": "text/markdown" }
+      ]
+    }
+  }
+}
