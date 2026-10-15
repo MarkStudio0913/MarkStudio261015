@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# 校验工作流：不打包，只做快速静态检查（语法、清单合法性、内置引擎完整性）
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Syntax check (node --check, 排除 vendor 第三方)
+        run: |
+          set -e
+          fail=0
+          while IFS= read -r f; do
+            if ! node --check "$f"; then echo "SYNTAX FAIL: $f"; fail=1; fi
+          done < <(git ls-files '*.js' | grep -vE '^vendor/')
+          [ "$fail" -eq 0 ] && echo "All first-party JS pass syntax check"
+
+      - name: Validate JSON manifests
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('package.json','utf8')); console.log('package.json OK')"
+          node -e "JSON.parse(require('fs').readFileSync('package-lock.json','utf8')); console.log('package-lock.json OK')"
+
+      - name: Verify vendored engine integrity
+        run: |
+          set -e
+          test -f vendor/vditor/dist/index.js
+          grep -q "MarkStudio R39" vendor/vditor/dist/index.js && echo "vendor patch present"
+          for L in \
+            vendor/vditor/dist/LICENSE \
+            vendor/vditor/dist/js/lute/LICENSE \
+            vendor/vditor/dist/js/katex/LICENSE \
+            vendor/vditor/dist/js/highlight.js/LICENSE; do
+            test -f "$L" && echo "license OK: $L"
+          done
+          # emoji 目录（含第三方商标图）应已被裁剪
+          test ! -d vendor/vditor/dist/images/emoji && echo "emoji pruned OK"
+
+      - name: Verify no secrets / absolute user paths in first-party source
+        run: |
+          set -e
+          if git grep -nIE "C:\\\\Users|/Users/[a-z]|/home/[a-z]|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{30}" -- 'src' 'scripts' 'build' '*.json' '*.md'; then
+            echo "Potential sensitive path/secret found"; exit 1
+          fi
+          echo "No obvious secrets or absolute user paths"
